@@ -63,11 +63,12 @@ function love.keypressed(k)
 end
 
 function love.update( dt )
-    if ( pause > 0 ) then
-        pause = pause - dt
-        love.timer.sleep(0.01)
-        return
-    end
+    -- induces a pause after each generation, allowing for screenshots or whatever
+    --if ( pause > 0 ) then
+        --pause = pause - dt
+        --love.timer.sleep(0.01)
+        --return
+    --end
     t = love.timer.getTime()
     points = {};
     i=1
@@ -102,8 +103,16 @@ function love.update( dt )
         end
         if ( y > ry ) then
             y = -ry
-            bot = love.math.random()
-            top = love.math.random()*10
+            --bot = love.math.random()
+            --top = love.math.random()*10
+            bot = bot - 0.02
+            top = top + 0.24
+            if ( bot < 0 ) then
+                bot = 1
+            end
+            if ( top > 10 ) then
+                top = 1
+            end
             pause = 1
             break
         end
@@ -119,6 +128,5 @@ function love.draw()
 
     love.graphics.setCanvas()
     love.graphics.origin()
-    love.graphics.clear(0,0,0,255)
     love.graphics.draw(canvas)
 end
