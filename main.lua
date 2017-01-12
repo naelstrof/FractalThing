@@ -18,6 +18,8 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+flux = require "flux/flux"
+
 function love.load()
     local pixelcode = [[
         uniform float bot;
@@ -55,8 +57,19 @@ function love.load()
     h = love.graphics.getHeight()/2;
     love.window.setMode(500, 500, {fullscreen=false, resizable=true, vsync=false})
     canvas = love.graphics.newCanvas(500,500);
-    bot = love.math.random()
-    top = love.math.random()*10
+    bot = {}
+    bot.x = 1
+    top = {}
+    top.x = 1
+    started = false
+end
+
+function resetbot()
+    flux.to(bot, 5, {x=0}):ease("quadinout"):after(bot, 5, {x=1}):ease("quadinout"):oncomplete(resetbot)
+end
+
+function resettop()
+    flux.to(top, 6, {x=10}):ease("quadinout"):after(top, 6, {x=1}):ease("quadinout"):oncomplete(resettop)
 end
 
 function love.resize(width,height)
@@ -70,17 +83,19 @@ function love.keypressed(k)
 end
 
 function love.update( dt )
-    bot = bot-dt*.125
-    top = top+dt*1.5
-    if ( bot < 0 ) then bot = 1 end
-    if ( top > 10 ) then top = 1 end
+    if ( not started ) then
+        resettop()
+        resetbot()
+        started = true
+    end
+    flux.update(dt)
 end
 
 function love.draw()
     love.graphics.setColor(0,255,0,255)
     love.graphics.setShader( fractalShader )
-    fractalShader:send( "top", top )
-    fractalShader:send( "bot", bot )
+    fractalShader:send( "top", top.x )
+    fractalShader:send( "bot", bot.x )
     love.graphics.draw(canvas)
     love.graphics.setShader()
 end
