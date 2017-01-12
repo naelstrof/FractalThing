@@ -24,8 +24,9 @@ function love.load()
         uniform float top;
         vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords )
         {
-            float x = (texture_coords.x-0.5)*2;
-            float y = (texture_coords.y-0.5)*2;
+            float ratio = love_ScreenSize.x/love_ScreenSize.y;
+            float x = (texture_coords.x-0.5)*4*ratio;
+            float y = (texture_coords.y-0.5)*4;
             vec2 p = vec2(x,y)/(x*x+y*y);
             float z = (x-p.x)*(x-p.x)+(y-p.y)*(y-p.y);
             float abs = length( p );
@@ -69,14 +70,14 @@ function love.keypressed(k)
 end
 
 function love.update( dt )
-    bot = bot-dt
-    top = top+dt*12
+    bot = bot-dt*.125
+    top = top+dt*1.5
     if ( bot < 0 ) then bot = 1 end
     if ( top > 10 ) then top = 1 end
 end
 
 function love.draw()
-    love.graphics.setColor(255,255,255,255)
+    love.graphics.setColor(0,255,0,255)
     love.graphics.setShader( fractalShader )
     fractalShader:send( "top", top )
     fractalShader:send( "bot", bot )
