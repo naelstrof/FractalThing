@@ -53,15 +53,17 @@ function love.load()
         }
     ]]
     fractalShader = love.graphics.newShader(pixelcode, vertexcode)
-    w = love.graphics.getWidth()/2;
-    h = love.graphics.getHeight()/2;
     love.window.setMode(500, 500, {fullscreen=false, resizable=true, vsync=false})
     canvas = love.graphics.newCanvas(500,500);
+    w = love.graphics.getWidth()/2
+    h = love.graphics.getHeight()/2
     bot = {}
     bot.x = 1
     top = {}
     top.x = 1
     started = false
+    zoom = 1
+    zoompos = {x=0,y=0}
 end
 
 function resetbot()
@@ -74,11 +76,29 @@ end
 
 function love.resize(width,height)
     canvas = love.graphics.newCanvas( width, height )
+    w = love.graphics.getWidth()/2;
+    h = love.graphics.getHeight()/2;
 end
 
 function love.keypressed(k)
     if k == 'escape' then
         love.event.quit()
+    elseif k == 'up' then
+        zoompos.y = zoompos.y - (1/zoom)*25
+    elseif k == 'down' then
+        zoompos.y = zoompos.y + (1/zoom)*25
+    elseif k == 'left' then
+        zoompos.x = zoompos.x - (1/zoom)*25
+    elseif k == 'right' then
+        zoompos.x = zoompos.x + (1/zoom)*25
+    end
+end
+
+function love.wheelmoved(x, y)
+    if y > 0 then
+        zoom = zoom*1.04
+    else
+        zoom = zoom*.96
     end
 end
 
@@ -94,8 +114,10 @@ end
 function love.draw()
     love.graphics.setColor(0,255,0,255)
     love.graphics.setShader( fractalShader )
+    love.graphics.translate( -zoompos.x+w, -zoompos.y+h )
+    love.graphics.scale( zoom )
     fractalShader:send( "top", top.x )
     fractalShader:send( "bot", bot.x )
-    love.graphics.draw(canvas)
+    love.graphics.draw(canvas, zoompos.x-w, zoompos.y-h)
     love.graphics.setShader()
 end
