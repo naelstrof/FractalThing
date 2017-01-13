@@ -64,14 +64,26 @@ function love.load()
     started = false
     zoom = 1
     zoompos = {x=0,y=0}
+    color = {r=1,g=1,b=1}
 end
 
 function resetbot()
-    flux.to(bot, 5, {x=0}):ease("quadinout"):after(bot, 5, {x=1}):ease("quadinout"):oncomplete(resetbot)
+    flux.to(bot, 6, {x=0}):ease("quadinout"):after(bot, 6, {x=1}):ease("quadinout"):oncomplete(resetbot)
 end
 
 function resettop()
-    flux.to(top, 6, {x=10}):ease("quadinout"):after(top, 6, {x=1}):ease("quadinout"):oncomplete(resettop)
+    flux.to(top, 8, {x=10}):ease("quadinout"):after(top, 8, {x=1}):ease("quadinout"):oncomplete(resettop)
+end
+
+function resetcolor()
+    flux.to(color, 3, {r=1,g=0,b=0}):ease("quadinout")
+    :after(color, 3, {r=1,g=1,b=0}):ease("quadinout")
+    :after(color, 3, {r=0,g=1,b=0}):ease("quadinout")
+    :after(color, 3, {r=0,g=1,b=1}):ease("quadinout")
+    :after(color, 3, {r=0,g=0,b=1}):ease("quadinout")
+    :after(color, 3, {r=1,g=0,b=1}):ease("quadinout")
+    :after(color, 3, {r=1,g=1,b=1}):ease("quadinout")
+    :oncomplete(resetcolor)
 end
 
 function love.resize(width,height)
@@ -84,13 +96,13 @@ function love.keypressed(k)
     if k == 'escape' then
         love.event.quit()
     elseif k == 'up' then
-        zoompos.y = zoompos.y - (1/zoom)*25
-    elseif k == 'down' then
         zoompos.y = zoompos.y + (1/zoom)*25
+    elseif k == 'down' then
+        zoompos.y = zoompos.y - (1/zoom)*25
     elseif k == 'left' then
-        zoompos.x = zoompos.x - (1/zoom)*25
-    elseif k == 'right' then
         zoompos.x = zoompos.x + (1/zoom)*25
+    elseif k == 'right' then
+        zoompos.x = zoompos.x - (1/zoom)*25
     end
 end
 
@@ -106,13 +118,14 @@ function love.update( dt )
     if ( not started ) then
         resettop()
         resetbot()
+        resetcolor()
         started = true
     end
     flux.update(dt)
 end
 
 function love.draw()
-    love.graphics.setColor(0,255,0,255)
+    love.graphics.setColor(255*color.r,255*color.g,255*color.b,255)
     love.graphics.setShader( fractalShader )
     love.graphics.translate( -zoompos.x+w, -zoompos.y+h )
     love.graphics.scale( zoom )
